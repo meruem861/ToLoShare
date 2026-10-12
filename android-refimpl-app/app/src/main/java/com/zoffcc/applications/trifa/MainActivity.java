@@ -1753,6 +1753,8 @@ public class MainActivity extends BaseProtectedActivity
         }
         PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
                 R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
+        PrimaryDrawerItem item8 = new PrimaryDrawerItem().withIdentifier(8).withName(
+                "Location group").withIcon(GoogleMaterial.Icon.gmd_group);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
                 R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Change Code");
@@ -1777,7 +1779,7 @@ public class MainActivity extends BaseProtectedActivity
                 R.id.drawer_container).withShowDrawerOnFirstLaunch(false).withActionBarDrawerToggleAnimated(
                 true).withActionBarDrawerToggle(true).withToolbar(toolbar).addDrawerItems(item1,
                                                                                           new DividerDrawerItem(),
-                                                                                          item2, item3, item4, item5,
+                                                                                          item8, item2, item3, item4, item5,
                                                                                           new DividerDrawerItem(),
                                                                                           item6,
                                                                                           new DividerDrawerItem(),
@@ -1789,8 +1791,10 @@ public class MainActivity extends BaseProtectedActivity
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                     {
                         Log.i(TAG, "drawer:item=" + position);
+                        // HINT: use the item identifier, list positions shift when items are added
+                        final long item_id = drawerItem.getIdentifier();
 
-                        if (position == 1)
+                        if (item_id == 1)
                         {
                             // profile
                             try
@@ -1807,7 +1811,7 @@ public class MainActivity extends BaseProtectedActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 3)
+                        else if (item_id == 2)
                         {
                             // settings
                             try
@@ -1824,7 +1828,7 @@ public class MainActivity extends BaseProtectedActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 4)
+                        else if (item_id == 3)
                         {
                             // logout/login
                             try
@@ -1843,7 +1847,7 @@ public class MainActivity extends BaseProtectedActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 6)
+                        else if (item_id == 5)
                         {
                             // About
                             try
@@ -1857,7 +1861,19 @@ public class MainActivity extends BaseProtectedActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 5)
+                        else if (item_id == 8)
+                        {
+                            // Location group
+                            try
+                            {
+                                GroupLocationShare.show_location_group_dialog(MainActivity.this);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        else if (item_id == 4)
                         {
                             // Maintenance
                             try
@@ -1870,19 +1886,13 @@ public class MainActivity extends BaseProtectedActivity
                             {
                                 e.printStackTrace();
                             }
-
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
-                            // clearCache();
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
                         }
-                        else if (position == 8)
+                        else if (item_id == 6)
                         {
                             Intent intent = new Intent(context_s, ChangePinActivity.class);
                             startActivity(intent);
                         }
-                        else if (position == 10)
+                        else if (item_id == 7)
                         {
                             try
                             {
@@ -2528,17 +2538,18 @@ public class MainActivity extends BaseProtectedActivity
     {
         try
         {
-            List<FriendList> flist = orma.selectFromFriendList().toList();
-            if ((flist != null) && (flist.size() > 0))
+            // HINT: everybody we have a location for, friends and location group members
+            List<String> pubkeys = new ArrayList<>(remote_location_data.keySet());
+            if (pubkeys.size() > 0)
             {
                 String f_pubkey_pseudo_num_0 = get_friend_pubkey_sorted_by_pubkey_num(0);
                 String f_pubkey_pseudo_num_1 = get_friend_pubkey_sorted_by_pubkey_num(1);
-                for (FriendList friend : flist)
+                for (String pubkey : pubkeys)
                 {
-                    CaptureService.remote_location_entry re = remote_location_data.get(friend.tox_public_key_string);
+                    CaptureService.remote_location_entry re = remote_location_data.get(pubkey);
                     if (re != null)
                     {
-                        if (!remote_location_overlays.containsKey(friend.tox_public_key_string))
+                        if (!remote_location_overlays.containsKey(pubkey))
                         {
                             try
                             {
@@ -2551,9 +2562,9 @@ public class MainActivity extends BaseProtectedActivity
                                 remote_ol.remote_location_overlay.setLocation(geop);
                                 remote_ol.remote_location_overlay.setAccuracy(Math.round(re.remoteBestLocation.getAccuracy()));
                                 remote_ol.remote_location_overlay.setBearing((float) re.remoteBestLocation.getBearing());
-                                select_location_icon(re.has_bearing, re.has_bearing, friend.tox_public_key_string,
+                                select_location_icon(re.has_bearing, re.has_bearing, pubkey,
                                                      f_pubkey_pseudo_num_0, f_pubkey_pseudo_num_1, true, directed_ol);
-                                remote_location_overlays.put(friend.tox_public_key_string, remote_ol);
+                                remote_location_overlays.put(pubkey, remote_ol);
                                 map.getOverlays().add(directed_ol);
                             }
                             catch(Exception e)
@@ -2679,6 +2690,9 @@ public class MainActivity extends BaseProtectedActivity
             }
         };
         map.getOverlays().add(touchOverlay);
+
+        // HINT: tap on a friend's or group member's marker to see their name
+        map.getOverlays().add(new MarkerNameTapOverlay());
 
         debug_list_overlays();
     }
@@ -3983,6 +3997,9 @@ public class MainActivity extends BaseProtectedActivity
             case R.id.item_addfriend:
                 final Intent intent = new Intent(this, AddFriendActivity.class);
                 startActivityForResult(intent, AddFriendActivity_ID);
+                break;
+            case R.id.item_location_group:
+                GroupLocationShare.show_location_group_dialog(this);
                 break;
         }
         return true;
@@ -6494,6 +6511,43 @@ public class MainActivity extends BaseProtectedActivity
 
         try
         {
+            if ((length > 0) && (data[0] == (byte) GEO_COORDS_CUSTOM_LOSSLESS_ID))
+            {
+                String f_pubkey = null;
+                try
+                {
+                    f_pubkey = tox_friend_get_public_key__wrapper(friend_number);
+                }
+                catch(Exception e)
+                {
+                }
+
+                String f_name = null;
+                try
+                {
+                    f_name = tox_friend_get_name(friend_number);
+                }
+                catch(Exception e)
+                {
+                }
+
+                process_incoming_location_packet(f_pubkey, f_name, data, length);
+            }
+        }
+        catch(Exception e)
+        {
+        }
+    }
+
+    /*
+     * handle an incoming location packet (first byte is GEO_COORDS_CUSTOM_LOSSLESS_ID)
+     * sender_pubkey identifies the sender on the map:
+     *   for friends it is the friend's tox public key, for location group members it is their group peer key
+     */
+    static void process_incoming_location_packet(final String sender_pubkey, final String sender_name, byte[] data, long length)
+    {
+        try
+        {
             if (length > 0)
             {
                 try
@@ -6506,14 +6560,7 @@ public class MainActivity extends BaseProtectedActivity
 
                         // example data: TzGeo00:BEGINGEO:<lat>>:<lon>:0.0:22.03:124.1:ENDGEO
 
-                        String f_pubkey_top = null;
-                        try
-                        {
-                            f_pubkey_top = tox_friend_get_public_key__wrapper(friend_number);
-                        }
-                        catch(Exception e)
-                        {
-                        }
+                        final String f_pubkey_top = sender_pubkey;
 
                         final LongRunnable process_incoming_gps_location = (delta_value) -> {
                             try
@@ -6625,7 +6672,7 @@ public class MainActivity extends BaseProtectedActivity
                                         String f_pubkey = null;
                                         try
                                         {
-                                            f_pubkey = tox_friend_get_public_key__wrapper(friend_number);
+                                            f_pubkey = f_pubkey_top;
 
                                             //**MOCK**//
                                             //**MOCK**// if ((f_pubkey == null) || (f_pubkey.equals("-1")))
@@ -6688,8 +6735,8 @@ public class MainActivity extends BaseProtectedActivity
 
                                                 if (!remote_location_data.containsKey(f_pubkey))
                                                 {
-                                                    init_friend_location_data_struct(tox_friend_get_name(friend_number),
-                                                                                     f_pubkey, has_bearing);
+                                                    init_friend_location_data_struct(sender_name, f_pubkey,
+                                                                                     has_bearing);
                                                 }
                                                 else
                                                 {
@@ -7170,7 +7217,10 @@ public class MainActivity extends BaseProtectedActivity
             if (!remote_location_data.containsKey(f_pubkey))
             {
                 CaptureService.remote_location_entry re = new CaptureService.remote_location_entry();
-                re.friend_name = friend_name;
+                if (friend_name != null)
+                {
+                    re.friend_name = friend_name;
+                }
                 re.has_bearing = has_bearing;
                 re.gps_i = new GpsInterpolator();
                 remote_location_data.put(f_pubkey, re);
@@ -7342,16 +7392,22 @@ public class MainActivity extends BaseProtectedActivity
     {}
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
-    {}
+    {
+        GroupLocationShare.on_group_peer_exit(group_number, peer_id);
+    }
 
     static void android_tox_callback_group_peer_name_cb_method(long group_number, long peer_id)
     {}
 
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
-    {}
+    {
+        GroupLocationShare.on_group_join_fail(group_number, a_Tox_Group_Join_Fail);
+    }
 
     static void android_tox_callback_group_self_join_cb_method(long group_number)
-    {}
+    {
+        GroupLocationShare.on_group_self_join(group_number);
+    }
 
     static void android_tox_callback_group_moderation_cb_method(long group_number, long source_peer_id, long target_peer_id, int a_Tox_Group_Mod_Event)
     {}
@@ -7363,7 +7419,9 @@ public class MainActivity extends BaseProtectedActivity
     {}
 
     static void android_tox_callback_group_custom_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
-    {}
+    {
+        GroupLocationShare.on_group_custom_packet(group_number, peer_id, data, length);
+    }
 
     static void android_tox_callback_group_custom_private_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
     {}

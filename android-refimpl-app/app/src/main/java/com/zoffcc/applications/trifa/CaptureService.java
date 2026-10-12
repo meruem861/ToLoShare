@@ -522,14 +522,14 @@ public class CaptureService extends Service
             for (int fc = 0; fc < friends.length; fc++)
             {
                 //noinspection unused
-                final int res = tox_friend_send_lossless_packet(fc, data_bin, data_bin_len);
+                final int res = tox_friend_send_lossless_packet(friends[fc], data_bin, data_bin_len);
                 // Log.i(TAG, "fn=" + fc + " res=" + res + " " + bytes_to_hex(data_bin) + " len=" + data_bin_len);
 
                 if (res == 1)
                 {
                     try
                     {
-                        String f_pubkey = tox_friend_get_public_key__wrapper(fc);
+                        String f_pubkey = tox_friend_get_public_key__wrapper(friends[fc]);
                         if ((f_pubkey != null) && (f_pubkey.length() > 10))
                         {
                             f_tracker.ping_outgoing(f_pubkey);
@@ -545,6 +545,8 @@ public class CaptureService extends Service
         {
             e.printStackTrace();
         }
+
+        GroupLocationShare.send_location_to_all_groups(location);
     }
 
     static void send_location_update_to_friend(@NonNull Location location, @NonNull String fpubkey)
@@ -564,14 +566,14 @@ public class CaptureService extends Service
             for (int fc = 0; fc < friends.length; fc++)
             {
                 //noinspection unused
-                final int res = tox_friend_send_lossless_packet(fc, data_bin, data_bin_len);
+                final int res = tox_friend_send_lossless_packet(friends[fc], data_bin, data_bin_len);
                 // Log.i(TAG, "fn=" + fc + " res=" + res + " " + bytes_to_hex(data_bin) + " len=" + data_bin_len);
 
                 if (res == 1)
                 {
                     try
                     {
-                        String f_pubkey = tox_friend_get_public_key__wrapper(fc);
+                        String f_pubkey = tox_friend_get_public_key__wrapper(friends[fc]);
                         if ((f_pubkey != null) && (f_pubkey.length() > 10))
                         {
                             if (f_pubkey.equals(fpubkey))

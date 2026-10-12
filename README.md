@@ -37,6 +37,24 @@ Latest Automated Screenshots
 ToLoShare - Main Screen Usage Manual
 =
 
+## 👥 Location Group
+
+A location group lets a whole group of people see each other on the map, without everyone having to add everyone as a friend.
+
+Open it with the **group icon** in the top bar (or **Location group** in the side menu).
+
+| Action | What happens |
+|--------|--------------|
+| **Create group** | Creates a new group and shows its **Group ID**. |
+| **Share ID** | Copies the Group ID and opens the Android share menu, so you can send it to the people who should join. |
+| **Join group** | Paste a Group ID you were sent (it is pre-filled if it is on your clipboard). |
+| **Leave group** | Stops sharing your location with the group and removes its members from your map. |
+
+- Everyone in the group sees everyone else's live position on the map.
+- **Tap a marker** on the map to see who it is.
+- Anyone who has the Group ID can join, so only share it with people you trust.
+- Direct friends keep working as before. If someone is both your friend and in your group, they are only shown once.
+
 ## 🔘 The Three Toggle Switches (Top Bar)
 
 The three toggle switches are located in the **toolbar at the top** of the screen.
