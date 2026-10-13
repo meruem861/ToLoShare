@@ -7423,6 +7423,10 @@ public class MainActivity extends BaseProtectedActivity
     static void android_tox_callback_group_custom_private_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
     {}
 
+    // HINT: looked up by the native toxcore JNI lib (since 1.0.207), the app crashes on start if it is missing
+    static void android_tox_callback_group_mid_peer_list_changed_cb(String group_id)
+    {}
+
     // -------- called by native new Group methods --------
     // -------- called by native new Group methods --------
     // -------- called by native new Group methods --------

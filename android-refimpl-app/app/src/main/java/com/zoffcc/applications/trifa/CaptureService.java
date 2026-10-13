@@ -519,6 +519,11 @@ public class CaptureService extends Service
             data_bin[0] = (byte) GEO_COORDS_CUSTOM_LOSSLESS_ID;
 
             long[] friends = MainActivity.tox_self_get_friend_list();
+            if (friends == null)
+            {
+                // HINT: tox is not running (yet)
+                friends = new long[0];
+            }
             for (int fc = 0; fc < friends.length; fc++)
             {
                 //noinspection unused
@@ -563,6 +568,11 @@ public class CaptureService extends Service
             data_bin[0] = (byte) GEO_COORDS_CUSTOM_LOSSLESS_ID;
 
             long[] friends = MainActivity.tox_self_get_friend_list();
+            if (friends == null)
+            {
+                // HINT: tox is not running (yet)
+                friends = new long[0];
+            }
             for (int fc = 0; fc < friends.length; fc++)
             {
                 //noinspection unused
