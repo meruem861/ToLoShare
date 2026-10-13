@@ -1,0 +1,31 @@
+name: Build APK
+
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build debug APK
+        run: |
+          cd android-refimpl-app
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: toloshare-debug-apk
+          path: android-refimpl-app/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
