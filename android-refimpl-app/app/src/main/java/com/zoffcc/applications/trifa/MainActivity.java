@@ -6522,6 +6522,13 @@ public class MainActivity extends BaseProtectedActivity
                 {
                 }
 
+                //**MOCK**//
+                //**MOCK**// if ((f_pubkey == null) || (f_pubkey.equals("-1")))
+                //**MOCK**// {
+                //**MOCK**//     f_pubkey = "AAAAAAAAAAAA" + friend_number + "BB" + friend_number + "BB" + friend_number + "BB" + friend_number;
+                //**MOCK**// }
+                //**MOCK**//
+
                 String f_name = null;
                 try
                 {
@@ -6674,13 +6681,6 @@ public class MainActivity extends BaseProtectedActivity
                                         {
                                             f_pubkey = f_pubkey_top;
 
-                                            //**MOCK**//
-                                            //**MOCK**// if ((f_pubkey == null) || (f_pubkey.equals("-1")))
-                                            //**MOCK**// {
-                                            //**MOCK**//     f_pubkey = "AAAAAAAAAAAA" + friend_number + "BB" + friend_number + "BB" + friend_number + "BB" + friend_number;
-                                            //**MOCK**// }
-                                            //**MOCK**//
-
                                             if ((f_pubkey != null) && (f_pubkey.length() > 10))
                                             {
                                                 f_tracker.ping_incoming(f_pubkey);
@@ -6755,9 +6755,6 @@ public class MainActivity extends BaseProtectedActivity
                                         }
                                         catch (Exception e)
                                         {
-                                            //**MOCK**//
-                                            //**MOCK**// f_pubkey = "AAAAAAAAAAAA" + friend_number + "BB" + friend_number + "BB" + friend_number + "BB" + friend_number;
-                                            //**MOCK**//
                                         }
 
                                         try
